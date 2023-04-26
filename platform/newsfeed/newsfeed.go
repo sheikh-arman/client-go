@@ -11,6 +11,7 @@ type Adder interface {
 type Item struct {
 	Title string `json:"title"`
 	Post  string `json:"post"`
+	Id    string `json:"id"`
 }
 
 type Repo struct {

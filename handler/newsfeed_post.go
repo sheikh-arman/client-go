@@ -14,6 +14,7 @@ func NewsfeedPost(feed newsfeed.Adder) http.HandlerFunc {
 		feed.Add(newsfeed.Item{
 			Title: request["title"],
 			Post:  request["post"],
+			Id:    request["id"],
 		})
 
 		w.Write([]byte("Good job!"))
