@@ -6,3 +6,14 @@ await fetch('/newsfeed',{
         post: 'one'
     })
 })
+
+
+
+await fetch('/login',{
+    method: 'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({
+        Username: 'arman',
+        Password: '123'
+    })
+})

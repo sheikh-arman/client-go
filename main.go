@@ -149,6 +149,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(creds)
 
 	if err != nil {
+		fmt.Println("what1")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -156,6 +157,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	correctPassword, ok := Credslist[creds.Username]
 
 	if !ok || creds.Password != correctPassword {
+		fmt.Println("what2")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -167,6 +169,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		"exp": expiretime.Unix(),
 	})
 	if err != nil {
+		fmt.Println("what3")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -194,12 +197,11 @@ func main() {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-
 	r.Post("/login", Login)
-
 	r.Group(func(r chi.Router) {
-		r.Use(jwtauth.Verifier(TokenAuth))
-		r.Use(jwtauth.Authenticator)
+		// jwtauth-> will learn later
+		//r.Use(jwtauth.Verifier(TokenAuth))
+		//r.Use(jwtauth.Authenticator)
 		r.Route("/newsfeeds", func(r chi.Router) {
 			r.Get("/", GetNewsFeeds)
 			r.Get("/{id}", GetNewsFeed)
@@ -209,11 +211,12 @@ func main() {
 		})
 		r.Post("/logout", Logout)
 	})
-	port := 3000
+	port := 5050
 	Server := &http.Server{
 		Addr:    ":" + strconv.Itoa(port),
 		Handler: r,
 	}
-
+	fmt.Println("Serving on " + strconv.Itoa(port))
+	http.ListenAndServe(strconv.Itoa(port), r)
 	fmt.Println(Server.ListenAndServe())
 }
