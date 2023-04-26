@@ -200,7 +200,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(TokenAuth))
 		r.Use(jwtauth.Authenticator)
-		r.Route("newsfeeds", func(r chi.Router) {
+		r.Route("/newsfeeds", func(r chi.Router) {
 			r.Get("/", GetNewsFeeds)
 			r.Get("/{id}", GetNewsFeed)
 			r.Post("/", CreateNewsFeed)
@@ -214,5 +214,6 @@ func main() {
 		Addr:    ":" + strconv.Itoa(port),
 		Handler: r,
 	}
-	Server.ListenAndServe()
+
+	fmt.Println(Server.ListenAndServe())
 }
