@@ -3,17 +3,18 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+	"sort"
+	"strconv"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/sheikh-arman/api-server/newsfeed"
-	"log"
-	"net/http"
-	"sort"
-	"strconv"
-	"time"
 )
 
 var jwtkey = []byte("adsads")
@@ -28,16 +29,25 @@ var Credslist map[string]string
 func InitCred() {
 	TokenAuth = jwtauth.New(string(jwa.HS256), jwtkey, nil)
 	Credslist = make(map[string]string)
-	creds := newsfeed.Credentials{
-		"arman",
-		"123",
+
+	creds := []newsfeed.Credentials{
+		{
+			Username: "arman",
+			Password: "123",
+		},
 	}
-	Credslist[creds.Username] = creds.Password
+
+	for _, cred := range creds {
+		Credslist[cred.Username] = cred.Password
+	}
 }
-func InitID() {
+
+func initID() {
 	ID = 0
 }
+
 func InitDB() {
+	initID()
 	var feed newsfeed.Item
 	feed = newsfeed.Item{
 		Id:    ID,
@@ -64,24 +74,31 @@ func InitDB() {
 	feeds = append(feeds, feed)
 }
 
+func WriteJsonResponse(w http.ResponseWriter, status int, data any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
+}
+
 func GetNewsFeeds(w http.ResponseWriter, r *http.Request) {
 	log.Println("test")
-	w.Header().Set("Content-Type", "application/json")
 	sort.SliceStable(feeds, func(i, j int) bool {
 		return feeds[i].Id < feeds[j].Id
 	})
-	json.NewEncoder(w).Encode(feeds)
+
+	WriteJsonResponse(w, http.StatusOK, feeds)
 }
 func GetNewsFeed(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	param := chi.URLParam(r, "id")
 	paramsID, _ := strconv.Atoi(param)
 
 	for _, curFeed := range feeds {
 		if curFeed.Id == paramsID {
-			json.NewEncoder(w).Encode(curFeed)
+			WriteJsonResponse(w, http.StatusOK, curFeed)
+			return
 		}
 	}
+	WriteJsonResponse(w, http.StatusNotFound, "Newsfeed doesn't exist")
 }
 func CreateNewsFeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -147,7 +164,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	correctPassword, ok := Credslist[creds.Username]
 
 	if !ok || creds.Password != correctPassword {
-		fmt.Println("what2")
+		//fmt.Println("what2")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -159,7 +176,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		"exp": expiretime.Unix(),
 	})
 	if err != nil {
-		fmt.Println("what3")
+		//fmt.Println("what3")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -179,7 +196,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 }
 func StartServer(port int) {
 	InitCred()
-	InitID()
 	InitDB()
 
 	r := chi.NewRouter()
@@ -190,8 +206,8 @@ func StartServer(port int) {
 	r.Post("/login", Login)
 	r.Group(func(r chi.Router) {
 		// jwtauth-> will learn later
-		//r.Use(jwtauth.Verifier(TokenAuth))
-		//r.Use(jwtauth.Authenticator)
+		r.Use(jwtauth.Verifier(TokenAuth))
+		r.Use(jwtauth.Authenticator)
 		r.Route("/newsfeeds", func(r chi.Router) {
 			r.Get("/", GetNewsFeeds)
 			r.Get("/{id}", GetNewsFeed)
