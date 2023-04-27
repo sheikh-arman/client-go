@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-var jwtkey = []byte("Neaj's Secret Key, He will not share it")
+var jwtkey = []byte("adsads")
 var TokenAuth *jwtauth.JWTAuth
 var tokenString string
 var token jwt.Token
@@ -217,6 +217,6 @@ func main() {
 		Handler: r,
 	}
 	fmt.Println("Serving on " + strconv.Itoa(port))
-	http.ListenAndServe(strconv.Itoa(port), r)
+	//http.ListenAndServe(strconv.Itoa(port), r)
 	fmt.Println(Server.ListenAndServe())
 }
