@@ -42,12 +42,7 @@ func InitCred() {
 	}
 }
 
-func initID() {
-	ID = 0
-}
-
 func InitDB() {
-	initID()
 	var feed newsfeed.Item
 	feed = newsfeed.Item{
 		Id:    ID,
@@ -88,6 +83,7 @@ func GetNewsFeeds(w http.ResponseWriter, r *http.Request) {
 
 	WriteJsonResponse(w, http.StatusOK, feeds)
 }
+
 func GetNewsFeed(w http.ResponseWriter, r *http.Request) {
 	param := chi.URLParam(r, "id")
 	paramsID, _ := strconv.Atoi(param)
@@ -100,6 +96,7 @@ func GetNewsFeed(w http.ResponseWriter, r *http.Request) {
 	}
 	WriteJsonResponse(w, http.StatusNotFound, "Newsfeed doesn't exist")
 }
+
 func CreateNewsFeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newFeed newsfeed.Item
@@ -137,12 +134,8 @@ func UpdateNewsFeed(w http.ResponseWriter, r *http.Request) {
 	}
 	for index, curFeed := range feeds {
 		if curFeed.Id == paramID {
-			feeds = append(feeds[:index], feeds[index+1:]...)
 			newFeed.Id = paramID
-			feeds = append(feeds, newFeed)
-			sort.SliceStable(feeds, func(i, j int) bool {
-				return feeds[i].Id < feeds[j].Id
-			})
+			feeds[index] = newFeed
 			json.NewEncoder(w).Encode(feeds)
 			return
 		}
@@ -152,7 +145,6 @@ func UpdateNewsFeed(w http.ResponseWriter, r *http.Request) {
 func Login(w http.ResponseWriter, r *http.Request) {
 	var creds newsfeed.Credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
-
 	fmt.Println(creds)
 
 	if err != nil {
@@ -180,6 +172,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	fmt.Printf("token string = %s \n", tokenString)
 	http.SetCookie(w, &http.Cookie{
 		Name:    "jwt",
 		Value:   tokenString,
@@ -187,6 +180,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	})
 	w.WriteHeader(http.StatusOK)
 }
+
 func Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    "jwt",
