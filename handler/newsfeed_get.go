@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
@@ -24,6 +24,7 @@ var token jwt.Token
 
 var ID int
 var feeds []newsfeed.Item
+var feeds2 map[int]newsfeed.Item
 var Credslist map[string]string
 
 func InitCred() {
@@ -43,12 +44,14 @@ func InitCred() {
 }
 
 func InitDB() {
+	ID = 1
 	var feed newsfeed.Item
 	feed = newsfeed.Item{
 		Id:    ID,
 		Title: "Nothing",
 		Post:  "Lorem Ipsum Doller Site",
 	}
+	feeds2[ID] = feed
 	ID++
 	feeds = append(feeds, feed)
 
@@ -57,6 +60,7 @@ func InitDB() {
 		Title: "Nothing2",
 		Post:  "Lorem Ipsum Doller Site2",
 	}
+	feeds2[ID] = feed
 	ID++
 	feeds = append(feeds, feed)
 
@@ -65,6 +69,7 @@ func InitDB() {
 		Title: "Nothing3",
 		Post:  "Lorem Ipsum Doller Site3",
 	}
+	feeds2[ID] = feed
 	ID++
 	feeds = append(feeds, feed)
 }
@@ -80,8 +85,7 @@ func GetNewsFeeds(w http.ResponseWriter, r *http.Request) {
 	sort.SliceStable(feeds, func(i, j int) bool {
 		return feeds[i].Id < feeds[j].Id
 	})
-
-	WriteJsonResponse(w, http.StatusOK, feeds)
+	WriteJsonResponse(w, http.StatusOK, feeds2)
 }
 
 func GetNewsFeed(w http.ResponseWriter, r *http.Request) {
@@ -119,8 +123,8 @@ func DeleteNewsFeed(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	fmt.Println(feeds)
-	json.NewEncoder(w).Encode(feeds)
+	//fmt.Println(feeds)
+	WriteJsonResponse(w, http.StatusOK, feeds)
 }
 func UpdateNewsFeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")

@@ -29,3 +29,4 @@ ENTRYPOINT ["./api-server"]
 # Set default command when a container will be started
 # In my case, my start command starts the server in 5050 port by default
 CMD ["start"]
+
