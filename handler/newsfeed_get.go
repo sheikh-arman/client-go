@@ -51,7 +51,7 @@ func InitDB() {
 		Title: "Nothing",
 		Post:  "Lorem Ipsum Doller Site",
 	}
-	feeds2[ID] = feed
+	//feeds2[ID] = feed
 	ID++
 	feeds = append(feeds, feed)
 
@@ -60,7 +60,7 @@ func InitDB() {
 		Title: "Nothing2",
 		Post:  "Lorem Ipsum Doller Site2",
 	}
-	feeds2[ID] = feed
+	//feeds2[ID] = feed
 	ID++
 	feeds = append(feeds, feed)
 
@@ -69,7 +69,7 @@ func InitDB() {
 		Title: "Nothing3",
 		Post:  "Lorem Ipsum Doller Site3",
 	}
-	feeds2[ID] = feed
+	//feeds2[ID] = feed
 	ID++
 	feeds = append(feeds, feed)
 }
