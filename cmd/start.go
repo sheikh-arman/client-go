@@ -20,6 +20,6 @@ var (
 )
 
 func init() {
-	startCmd.PersistentFlags().IntVarP(&Port, "port", "p", 5050, "default port for http server")
+	startCmd.PersistentFlags().IntVarP(&Port, "port", "p", 8080, "default port for http server")
 	rootCmd.AddCommand(startCmd)
 }
