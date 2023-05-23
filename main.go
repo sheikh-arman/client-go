@@ -1,10 +1,17 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package main
 
-import "github.com/sheikh-arman/api-server/cmd"
+import (
+	"flag"
+	"fmt"
+
+	"k8s.io/client-go/tools/clientcmd"
+)
 
 func main() {
-	cmd.Execute()
+	kubeconfig := flag.String("kubeconfig", "~/.kube/config", "location to your kubeconfig file")
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(config)
 }
